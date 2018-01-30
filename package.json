@@ -13,11 +13,13 @@
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.2",
+    "snazzy": "^7.0.0",
     "standard": "^10.0.3"
   },
   "scripts": {
-    "build": "rollup -c",
-    "lint": "standard"
+    "lint": "standard --verbose | snazzy",
+    "build": "rollup -c && cp src/style.css src/index.html build",
+    "lint:build": "clear && yarn lint && clear && yarn build"
   },
   "babel": {
     "presets": [
