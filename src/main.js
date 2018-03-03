@@ -2,6 +2,7 @@ import { app } from 'hyperapp'
 import { h } from 'ijk'
 import {
   adjust,
+  all,
   append,
   compose,
   concat,
@@ -16,15 +17,27 @@ import {
   update
 } from 'ramda'
 
-// TODO some kind of visual bell when input is disallowed (letter at end of
-// line, backspace at beginning of text, etc)
-
-// TODO get appropriate texts from somewhere
-
-// TODO track accuracy and time, display on completion
-
-// TODO focus a hidden textarea so that we can type `'` etc without triggering
+// TODO
+//
+// - some kind of visual bell when input is disallowed (letter at end of line,
+// backspace at beginning of text, etc)
+//
+// - get appropriate texts from somewhere
+//
+// - track accuracy
+//
+// - track time
+//
+// - display accuracy and time on completion
+//
+// - focus a hidden textarea so that we can type `'` etc without triggering
 // shortcuts in firefox
+//
+// - tab support
+//
+// - delete by word support
+//
+// - fix backspace behaviour immediately following enter
 
 const newLineChar = ['span', {}, '\n']
 
@@ -59,18 +72,16 @@ const text = compose(
 )
 
 const state = {
-  text: text(`Returns a curried equivalent of the provided function. The curried function has two unusual capabilities. First, its arguments needn't be provided one at a time. If f is a ternary function and g is R.curry(f), the following are equivalent:
-
-    g(1)(2)(3)
-    g(1)(2, 3)
-    g(1, 2)(3)
-    g(1, 2, 3)
-
-Secondly, the special placeholder value R.__ may be used to specify "gaps", allowing partial application of any combination of arguments, regardless of their positions. If g is as above and _ is R.__, the following are equivalent:`),
+  text: text(
+`Old pond
+frog jumped in
+sound of water
+`
+  ),
   cursor: { line: 0, char: 0 }
 }
 
-const onChar = key => ({ text, cursor: { line, char } }) => {
+const onChar = (key, { text, cursor: { line, char }, started }) => {
   // A job for lenses? http://ramdajs.com/docs/#lens
   if (char >= length(text[line]) - 1) {
     return { text, cursor: { line, char } }
@@ -81,11 +92,12 @@ const onChar = key => ({ text, cursor: { line, char } }) => {
       update(char, merge(text[line][char], { input: key }), text[line]),
       text
     ),
-    cursor: { line, char: char + 1 }
+    cursor: { line, char: char + 1 },
+    started: started || Date.now()
   }
 }
 
-const onEnter = ({ text, cursor: { line, char } }) => {
+const onEnter = ({ text, cursor: { line, char }, started }) => {
   if (line >= length(text) - 1) {
     return { text, cursor: { line, char } }
   }
@@ -125,16 +137,25 @@ const onBackspace = ({ text, cursor: { line, char } }) => {
 
 const isModified = event => event.altKey || event.ctrlKey || event.metaKey
 
+const isComplete = all(all(({ target, input }) => target === input))
+
+const checkComplete = state => ({
+  completed: isComplete(state.text) && Date.now(),
+  ...state
+})
+
 const actions = {
-  keydown: event => {
-    console.log('event:', event)
+  keydown: event => state => {
+    if (state.completed) {
+      return
+    }
     if (length(event.key) === 1 && !isModified(event)) {
       event.preventDefault()
-      return onChar(event.key)
+      return checkComplete(onChar(event.key, state))
     } else if (event.key === 'Enter') {
-      return onEnter
+      return checkComplete(onEnter(state))
     } else if (event.key === 'Backspace') {
-      return onBackspace
+      return onBackspace(state)
     }
   }
 }
@@ -154,13 +175,24 @@ const Text = ({ text, cursor }) => reduce(
   text
 )
 
+const Results = ({ text, complete, started, completed }) => completed
+  ? [
+    'div',
+    {},
+    `Completed in ${(completed - started) / 1000}s.`
+  ]
+  : []
+
 const view = (state, actions) => h('name', 'props', 'children')([
   'div',
   {
     class: 'text',
     oncreate: () => window.addEventListener('keydown', actions.keydown)
   },
-  Text(state)
+  [
+    Text(state),
+    Results(state, actions)
+  ]
 ])
 
 window.main = app(state, actions, view, document.body)
