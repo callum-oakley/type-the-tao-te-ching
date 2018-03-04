@@ -17,6 +17,8 @@ import {
   update
 } from 'ramda'
 
+import texts from './tao-te-ching.json'
+
 // TODO
 //
 // - some kind of visual bell when input is disallowed (letter at end of line,
@@ -40,6 +42,8 @@ import {
 // - fix backspace behaviour immediately following enter
 //
 // - get a random text on each load
+//
+// - accuracy appears to be broken
 
 const newLineChar = ['span', {}, '\n']
 
@@ -73,17 +77,10 @@ const text = compose(
   splitEvery(1)
 )
 
+const choose = x => x[Math.round(Math.random() * length(x))]
+
 const state = {
-  text: text(
-`In 1993, the National Center for Supercomputing Applications (NCSA), a unit of the University of Illinois at Urbana-Champaign, released NCSA Mosaic, the first popular graphical Web browser, which played an important part in expanding the growth of the nascent World Wide Web. In 1994, a company called Mosaic Communications was founded in Mountain View, California and employed many of the original NCSA Mosaic authors to create Mosaic Netscape. However, it intentionally shared no code with NCSA Mosaic. The internal codename for the company's browser was Mozilla, which stood for "Mosaic killer", as the company's goal was to displace NCSA Mosaic as the world's number one web browser. The first version of the Web browser, Mosaic Netscape 0.9, was released in late 1994. Within four months it had already taken three-quarters of the browser market and became the main browser for the Internet in the 1990s. To avoid trademark ownership problems with the NCSA, the browser was subsequently renamed Netscape Navigator in the same year, and the company took the name Netscape Communications. Netscape Communications realized that the Web needed to become more dynamic. Marc Andreessen, the founder of the company believed that HTML needed a "glue language" that was easy to use by Web designers and part-time programmers to assemble components such as images and plugins, where the code could be written directly in the Web page markup.
-
-In 1995, Netscape Communications recruited Brendan Eich with the goal of embedding the Scheme programming language into its Netscape Navigator.[8] Before he could get started, Netscape Communications collaborated with Sun Microsystems to include in Netscape Navigator Sun's more static programming language Java, in order to compete with Microsoft for user adoption of Web technologies and platforms.[9] Netscape Communications then decided that the scripting language they wanted to create would complement Java and should have a similar syntax, which excluded adopting other languages such as Perl, Python, TCL, or Scheme. To defend the idea of JavaScript against competing proposals, the company needed a prototype. Eich wrote one in 10 days, in May 1995.
-
-Although it was developed under the name Mocha, the language was officially called LiveScript when it first shipped in beta releases of Netscape Navigator 2.0 in September 1995, but it was renamed JavaScript[2] when it was deployed in the Netscape Navigator 2.0 beta 3 in December.[10] The final choice of name caused confusion, giving the impression that the language was a spin-off of the Java programming language, and the choice has been characterized[11] as a marketing ploy by Netscape to give JavaScript the cachet of what was then the hot new Web programming language.
-
-There is a common misconception that JavaScript was influenced by an earlier Web page scripting language developed by Nombas named Cmm (not to be confused with the later C-- created in 1997).[12][13] Brendan Eich, however, had never heard of Cmm before he created LiveScript.[14] Nombas did pitch their embedded Web page scripting to Netscape, though Web page scripting was not a new concept, as shown by the ViolaWWW Web browser.[15] Nombas later switched to offering JavaScript instead of Cmm in their ScriptEase product and was part of the TC39 group that standardized ECMAScript.[16]
-`
-  ),
+  text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
   strokes: 0,
   errors: 0
@@ -208,7 +205,7 @@ const Results = ({ text, complete, started, completed, strokes, errors }) => {
       ['span', {}, `typed ${Math.round(words)} words at `],
       ['span', { class: 'highlight' }, `${Math.round(wpm)}wpm `],
       ['span', {}, 'with '],
-      ['span', { class: 'highlight' }, `${Math.round(accuracy)}%`],
+      ['span', { class: 'highlight' }, `${Math.round(accuracy)}% `],
       ['span', {}, 'accuracy']
     ]
   ]

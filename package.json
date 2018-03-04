@@ -5,6 +5,7 @@
     "hyperapp": "^1.0.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -14,6 +15,7 @@
     "rollup": "^0.55.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.2",
     "snazzy": "^7.0.0",
     "standard": "^10.0.3"
@@ -21,19 +23,14 @@
   "scripts": {
     "lint": "standard --verbose | snazzy",
     "build": "rollup -c && cp src/style.css src/index.html build",
-    "lint:build": "clear && yarn lint && clear && yarn build"
+    "lint:build": "clear && yarn lint && clear && yarn build",
+    "process-text": "babel-node scripts/process-text.js texts/tao-te-ching.txt"
   },
   "babel": {
     "presets": [
-      [
-        "env",
-        {
-          "modules": false
-        }
-      ]
+      "env"
     ],
     "plugins": [
-      "external-helpers",
       "transform-object-rest-spread"
     ]
   }
