@@ -7,8 +7,7 @@ body {
 .text {
   font-size: 1rem;
   margin: 10rem auto;
-  max-height: 50rem;
-  max-width: 50rem;
+  max-width: 40rem;
   padding: 2rem 2rem;
   position: center;
   resize: none;
@@ -26,4 +25,8 @@ body {
 .cursor {
   background-color: #C0C5CE;
   color: #1B2B34;
+}
+
+.highlight {
+  color: #99C794;
 }
