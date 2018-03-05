@@ -29,7 +29,9 @@ import texts from './tao-te-ching.json'
 //
 // - delete by word support
 //
-// - graph previous results
+// - graph history
+
+const localData = window.localStorage.getItem('history')
 
 const newLineChar = ['span', {}, '\n']
 
@@ -69,7 +71,8 @@ const state = {
   text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
   strokes: 0,
-  errors: 0
+  errors: 0,
+  history: localData ? JSON.parse(localData) : []
 }
 
 const onChar = (
@@ -146,11 +149,14 @@ const checkComplete = state => {
   const words = reduce((sum, line) => sum + length(line), 0, state.text) / 5
   const wpm = 60 * words / seconds
   const accuracy = 100 * (state.strokes - state.errors) / state.strokes
+  const score = { wpm, accuracy }
+  const history = append(score, state.history)
+  window.localStorage.setItem('history', JSON.stringify(history))
   return {
     completed: true,
     words,
-    wpm,
-    accuracy,
+    score,
+    history,
     ...state
   }
 }
@@ -186,7 +192,7 @@ const Text = ({ text, cursor }) => reduce(
   text
 )
 
-const Results = ({ completed, words, wpm, accuracy }) => {
+const Results = ({ completed, words, score }) => {
   if (!completed) {
     return []
   }
@@ -195,9 +201,9 @@ const Results = ({ completed, words, wpm, accuracy }) => {
     {},
     [
       ['span', {}, `typed ${Math.round(words)} words at `],
-      ['span', { class: 'wpm' }, `${Math.round(wpm)}wpm `],
+      ['span', { class: 'wpm' }, `${Math.round(score.wpm)}wpm `],
       ['span', {}, 'with '],
-      ['span', { class: 'accuracy' }, `${Math.round(accuracy)}% `],
+      ['span', { class: 'accuracy' }, `${Math.round(score.accuracy)}% `],
       ['span', {}, 'accuracy']
     ]
   ]
