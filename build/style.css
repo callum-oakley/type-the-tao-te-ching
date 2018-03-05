@@ -4,6 +4,15 @@ body {
   font-family: 'Source Code Pro', monospace;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #5FB3B3;
+}
+
 .text {
   font-size: 1rem;
   margin: 10rem auto;
@@ -33,4 +42,16 @@ body {
 
 .accuracy {
   color: #5FB3B3;
+}
+
+.left {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
+.right {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }

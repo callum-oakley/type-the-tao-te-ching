@@ -25,15 +25,9 @@ import texts from './tao-te-ching.json'
 //
 // - fix backspace behaviour immediately following enter
 //
-// - link to project gutenberg
-//
-// - link to github
-//
 // - tab support
 //
 // - delete by word support
-//
-// - prune text json
 //
 // - graph previous results
 
@@ -201,13 +195,35 @@ const Results = ({ text, complete, started, completed, strokes, errors }) => {
 
 const view = (state, actions) => h('name', 'props', 'children')([
   'div',
-  {
-    class: 'text',
-    oncreate: () => window.addEventListener('keydown', actions.keydown)
-  },
+  {},
   [
-    Text(state),
-    Results(state, actions)
+    [
+      'div',
+      {},
+      [
+        [
+          'a',
+          { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' },
+          '[project gutenberg]'
+        ],
+        [
+          'a',
+          { class: 'right', href: 'https://github.com/hot-leaf-juice/gghf' },
+          '[source]'
+        ]
+      ]
+    ],
+    [
+      'div',
+      {
+        class: 'text',
+        oncreate: () => window.addEventListener('keydown', actions.keydown)
+      },
+      [
+        Text(state),
+        Results(state, actions)
+      ]
+    ]
   ]
 ])
 
