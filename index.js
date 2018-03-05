@@ -3877,15 +3877,9 @@ var _extends = Object.assign || function (target) {
 //
 // - fix backspace behaviour immediately following enter
 //
-// - link to project gutenberg
-//
-// - link to github
-//
 // - tab support
 //
 // - delete by word support
-//
-// - prune text json
 //
 // - graph previous results
 
@@ -4063,12 +4057,12 @@ var Results = function Results(_ref8) {
 };
 
 var view$2 = function view(state, actions) {
-  return h$1('name', 'props', 'children')(['div', {
+  return h$1('name', 'props', 'children')(['div', {}, [['div', {}, [['a', { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' }, '[project gutenberg]'], ['a', { class: 'right', href: 'https://github.com/hot-leaf-juice/gghf' }, '[source]']]], ['div', {
     class: 'text',
     oncreate: function oncreate() {
       return window.addEventListener('keydown', actions.keydown);
     }
-  }, [Text(state), Results(state, actions)]]);
+  }, [Text(state), Results(state, actions)]]]]);
 };
 
 window.main = app(state, actions, view$2, document.body);
