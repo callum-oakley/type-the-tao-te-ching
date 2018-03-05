@@ -3973,7 +3973,7 @@ var onChar = function onChar(key, _ref2) {
     cursor: { line: line, char: char + 1 },
     started: started || Date.now(),
     strokes: strokes + 1,
-    errors: errors + key === text[line][char].target ? 0 : 1
+    errors: errors + (key === text[line][char].target ? 0 : 1)
   };
 };
 
