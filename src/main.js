@@ -170,8 +170,10 @@ const actions = {
       event.preventDefault()
       return checkComplete(onChar(event.key, state))
     } else if (event.key === 'Enter') {
+      event.preventDefault()
       return checkComplete(onEnter(state))
     } else if (event.key === 'Backspace') {
+      event.preventDefault()
       return onBackspace(state)
     }
   }
