@@ -1,0 +1,32 @@
+body {
+  background-color: #1B2B34;
+  color: #65737E;
+  font-family: 'Source Code Pro', monospace;
+}
+
+.text {
+  font-size: 1rem;
+  margin: 10rem auto;
+  max-width: 40rem;
+  padding: 2rem 2rem;
+  position: center;
+  resize: none;
+  white-space: pre-wrap;
+}
+
+.correct {
+  color: #C0C5CE;
+}
+
+.error {
+  color: #EC5f67;
+}
+
+.cursor {
+  background-color: #C0C5CE;
+  color: #1B2B34;
+}
+
+.highlight {
+  color: #99C794;
+}
