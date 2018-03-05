@@ -13,8 +13,7 @@ import {
   prop,
   reduce,
   splitEvery,
-  takeWhile,
-  update
+  takeWhile
 } from 'ramda'
 
 import texts from './tao-te-ching.json'
@@ -25,6 +24,10 @@ import texts from './tao-te-ching.json'
 // backspace at beginning of text, etc)
 //
 // - fix backspace behaviour immediately following enter
+//
+// - link to project gutenberg
+//
+// - link to github
 //
 // - tab support
 //
@@ -85,9 +88,9 @@ const onChar = (
     }
   }
   return {
-    text: update(
+    text: adjust(
+      l => adjust(c => merge(c, { input: key }), char, l),
       line,
-      update(char, merge(text[line][char], { input: key }), text[line]),
       text
     ),
     cursor: { line, char: char + 1 },
@@ -102,9 +105,9 @@ const onEnter = ({ text, cursor: { line, char }, started }) => {
     return { text, cursor: { line, char } }
   }
   return {
-    text: update(
+    text: adjust(
+      l => adjust(c => merge(c, { input: ' ' }), char, l),
       line,
-      update(char, merge(text[line][char], { input: ' ' }), text[line]),
       text
     ),
     cursor: { line: line + 1, char: 0 }
@@ -122,13 +125,9 @@ const onBackspace = ({ text, cursor: { line, char } }) => {
     char--
   }
   return {
-    text: update(
+    text: adjust(
+      l => adjust(c => merge(c, { input: undefined }), char, l),
       line,
-      update(
-        char,
-        merge(text[line][char], { input: undefined }),
-        text[line]
-      ),
       text
     ),
     cursor: { line, char }
