@@ -27,6 +27,10 @@ body {
   color: #1B2B34;
 }
 
-.highlight {
+.wpm {
   color: #99C794;
+}
+
+.accuracy {
+  color: #5FB3B3;
 }
