@@ -187,9 +187,9 @@ const Results = ({ text, complete, started, completed, strokes, errors }) => {
     {},
     [
       ['span', {}, `typed ${Math.round(words)} words at `],
-      ['span', { class: 'highlight' }, `${Math.round(wpm)}wpm `],
+      ['span', { class: 'wpm' }, `${Math.round(wpm)}wpm `],
       ['span', {}, 'with '],
-      ['span', { class: 'highlight' }, `${Math.round(accuracy)}% `],
+      ['span', { class: 'accuracy' }, `${Math.round(accuracy)}% `],
       ['span', {}, 'accuracy']
     ]
   ]

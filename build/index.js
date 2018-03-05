@@ -4055,7 +4055,7 @@ var Results = function Results(_ref8) {
   }, 0, text) / 5;
   var wpm = 60 * words / seconds;
   var accuracy = 100 * (strokes - errors) / strokes;
-  return ['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'highlight' }, Math.round(wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'highlight' }, Math.round(accuracy) + '% '], ['span', {}, 'accuracy']]];
+  return ['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(accuracy) + '% '], ['span', {}, 'accuracy']]];
 };
 
 var view$2 = function view(state, actions) {
