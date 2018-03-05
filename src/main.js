@@ -98,9 +98,10 @@ const onChar = (
   }
 }
 
-const onEnter = ({ text, cursor: { line, char }, started }) => {
+const onEnter = ({ text, cursor: { line, char }, ...rest }) => {
+  // TODO this should also increment strokes and errors
   if (line >= length(text) - 1) {
-    return { text, cursor: { line, char } }
+    return { text, cursor: { line, char }, ...rest }
   }
   return {
     text: adjust(
@@ -108,7 +109,8 @@ const onEnter = ({ text, cursor: { line, char }, started }) => {
       line,
       text
     ),
-    cursor: { line: line + 1, char: 0 }
+    cursor: { line: line + 1, char: 0 },
+    ...rest
   }
 }
 
@@ -136,10 +138,22 @@ const isModified = event => event.altKey || event.ctrlKey || event.metaKey
 
 const isComplete = all(all(({ target, input }) => target === input))
 
-const checkComplete = state => ({
-  completed: isComplete(state.text) && Date.now(),
-  ...state
-})
+const checkComplete = state => {
+  if (!isComplete(state.text)) {
+    return state
+  }
+  const seconds = (Date.now() - state.started) / 1000
+  const words = reduce((sum, line) => sum + length(line), 0, state.text) / 5
+  const wpm = 60 * words / seconds
+  const accuracy = 100 * (state.strokes - state.errors) / state.strokes
+  return {
+    completed: true,
+    words,
+    wpm,
+    accuracy,
+    ...state
+  }
+}
 
 const actions = {
   keydown: event => state => {
@@ -172,14 +186,10 @@ const Text = ({ text, cursor }) => reduce(
   text
 )
 
-const Results = ({ text, complete, started, completed, strokes, errors }) => {
+const Results = ({ completed, words, wpm, accuracy }) => {
   if (!completed) {
     return []
   }
-  const seconds = (completed - started) / 1000
-  const words = reduce((sum, line) => sum + length(line), 0, text) / 5
-  const wpm = 60 * words / seconds
-  const accuracy = 100 * (strokes - errors) / strokes
   return [
     `div`,
     {},

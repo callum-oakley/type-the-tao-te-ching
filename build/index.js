@@ -3870,6 +3870,30 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+var objectWithoutProperties = function (obj, keys) {
+  var target = {};
+
+  for (var i in obj) {
+    if (keys.indexOf(i) >= 0) continue;
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+    target[i] = obj[i];
+  }
+
+  return target;
+};
+
 // TODO
 //
 // - some kind of visual bell when input is disallowed (letter at end of line,
@@ -3947,19 +3971,20 @@ var onEnter = function onEnter(_ref3) {
       _ref3$cursor = _ref3.cursor,
       line = _ref3$cursor.line,
       char = _ref3$cursor.char,
-      started = _ref3.started;
+      rest = objectWithoutProperties(_ref3, ['text', 'cursor']);
 
+  // TODO this should also increment strokes and errors
   if (line >= length(text) - 1) {
-    return { text: text, cursor: { line: line, char: char } };
+    return _extends({ text: text, cursor: { line: line, char: char } }, rest);
   }
-  return {
+  return _extends({
     text: adjust(function (l) {
       return adjust(function (c) {
         return merge(c, { input: ' ' });
       }, char, l);
     }, line, text),
     cursor: { line: line + 1, char: 0 }
-  };
+  }, rest);
 };
 
 var onBackspace = function onBackspace(_ref4) {
@@ -3995,8 +4020,20 @@ var isComplete = all(all(function (_ref5) {
 }));
 
 var checkComplete = function checkComplete(state) {
+  if (!isComplete(state.text)) {
+    return state;
+  }
+  var seconds = (Date.now() - state.started) / 1000;
+  var words = reduce(function (sum, line) {
+    return sum + length(line);
+  }, 0, state.text) / 5;
+  var wpm = 60 * words / seconds;
+  var accuracy = 100 * (state.strokes - state.errors) / state.strokes;
   return _extends({
-    completed: isComplete(state.text) && Date.now()
+    completed: true,
+    words: words,
+    wpm: wpm,
+    accuracy: accuracy
   }, state);
 };
 
@@ -4037,22 +4074,14 @@ var Text = function Text(_ref7) {
 };
 
 var Results = function Results(_ref8) {
-  var text = _ref8.text,
-      complete = _ref8.complete,
-      started = _ref8.started,
-      completed = _ref8.completed,
-      strokes = _ref8.strokes,
-      errors = _ref8.errors;
+  var completed = _ref8.completed,
+      words = _ref8.words,
+      wpm = _ref8.wpm,
+      accuracy = _ref8.accuracy;
 
   if (!completed) {
     return [];
   }
-  var seconds = (completed - started) / 1000;
-  var words = reduce(function (sum, line) {
-    return sum + length(line);
-  }, 0, text) / 5;
-  var wpm = 60 * words / seconds;
-  var accuracy = 100 * (strokes - errors) / strokes;
   return ['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(accuracy) + '% '], ['span', {}, 'accuracy']]];
 };
 
