@@ -32,6 +32,10 @@ import texts from './tao-te-ching.json'
 // - tab support
 //
 // - delete by word support
+//
+// - prune text json
+//
+// - graph previous results
 
 const newLineChar = ['span', {}, '\n']
 
