@@ -24,26 +24,11 @@ import texts from './tao-te-ching.json'
 // - some kind of visual bell when input is disallowed (letter at end of line,
 // backspace at beginning of text, etc)
 //
-// - get appropriate texts from somewhere
-//
-// - track accuracy
-//
-// - track time
-//
-// - display accuracy and time on completion
-//
-// - focus a hidden textarea so that we can type `'` etc without triggering
-// shortcuts in firefox
+// - fix backspace behaviour immediately following enter
 //
 // - tab support
 //
 // - delete by word support
-//
-// - fix backspace behaviour immediately following enter
-//
-// - get a random text on each load
-//
-// - accuracy appears to be broken
 
 const newLineChar = ['span', {}, '\n']
 
