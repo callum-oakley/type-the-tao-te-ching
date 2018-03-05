@@ -3905,7 +3905,9 @@ var objectWithoutProperties = function (obj, keys) {
 //
 // - delete by word support
 //
-// - graph previous results
+// - graph history
+
+var localData = window.localStorage.getItem('history');
 
 var newLineChar = ['span', {}, '\n'];
 
@@ -3932,7 +3934,8 @@ var state = {
   text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
   strokes: 0,
-  errors: 0
+  errors: 0,
+  history: localData ? JSON.parse(localData) : []
 };
 
 var onChar = function onChar(key, _ref2) {
@@ -4029,11 +4032,14 @@ var checkComplete = function checkComplete(state) {
   }, 0, state.text) / 5;
   var wpm = 60 * words / seconds;
   var accuracy = 100 * (state.strokes - state.errors) / state.strokes;
+  var score = { wpm: wpm, accuracy: accuracy };
+  var history = append(score, state.history);
+  window.localStorage.setItem('history', JSON.stringify(history));
   return _extends({
     completed: true,
     words: words,
-    wpm: wpm,
-    accuracy: accuracy
+    score: score,
+    history: history
   }, state);
 };
 
@@ -4076,13 +4082,12 @@ var Text = function Text(_ref7) {
 var Results = function Results(_ref8) {
   var completed = _ref8.completed,
       words = _ref8.words,
-      wpm = _ref8.wpm,
-      accuracy = _ref8.accuracy;
+      score = _ref8.score;
 
   if (!completed) {
     return [];
   }
-  return ['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(accuracy) + '% '], ['span', {}, 'accuracy']]];
+  return ['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(score.wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(score.accuracy) + '% '], ['span', {}, 'accuracy']]];
 };
 
 var view$2 = function view(state, actions) {
