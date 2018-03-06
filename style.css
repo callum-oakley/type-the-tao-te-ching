@@ -13,7 +13,7 @@ a:hover {
   color: #5FB3B3;
 }
 
-.text {
+.center-column {
   font-size: 1rem;
   margin: 10rem auto;
   max-width: 40rem;
@@ -38,10 +38,12 @@ a:hover {
 
 .wpm {
   color: #99C794;
+  stroke: #99C794;
 }
 
 .accuracy {
   color: #5FB3B3;
+  stroke: #5FB3B3;
 }
 
 .left {
@@ -54,4 +56,17 @@ a:hover {
   position: absolute;
   top: 1rem;
   right: 1rem;
+}
+
+svg {
+  display: block;
+  fill: none;
+  margin: auto;
+  max-width: 40rem;
+  padding: 2rem 0;
+  stroke-width: 2px;
+}
+
+.charts {
+  padding: 2rem 0;
 }
