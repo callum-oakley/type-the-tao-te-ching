@@ -1,11 +1,13 @@
 import { app } from 'hyperapp'
 import { h } from 'ijk'
 import {
+  addIndex,
   adjust,
   all,
   append,
   compose,
   concat,
+  join,
   length,
   map,
   merge,
@@ -18,6 +20,9 @@ import {
 
 import texts from './tao-te-ching.json'
 
+const CHART_X = 1000
+const CHART_Y = 200
+
 // TODO
 //
 // - some kind of visual bell when input is disallowed (letter at end of line,
@@ -28,10 +33,8 @@ import texts from './tao-te-ching.json'
 // - tab support
 //
 // - delete by word support
-//
-// - graph history
 
-const localData = window.localStorage.getItem('history')
+const mapIndexed = addIndex(map)
 
 const newLineChar = ['span', {}, '\n']
 
@@ -71,8 +74,7 @@ const state = {
   text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
   strokes: 0,
-  errors: 0,
-  history: localData ? JSON.parse(localData) : []
+  errors: 0
 }
 
 const onChar = (
@@ -150,7 +152,8 @@ const checkComplete = state => {
   const wpm = 60 * words / seconds
   const accuracy = 100 * (state.strokes - state.errors) / state.strokes
   const score = { wpm, accuracy }
-  const history = append(score, state.history)
+  const localData = window.localStorage.getItem('history')
+  const history = append(score, localData ? JSON.parse(localData) : [])
   window.localStorage.setItem('history', JSON.stringify(history))
   return {
     completed: true,
@@ -188,13 +191,43 @@ const Char = cursor => ({ target, input, line, char }) =>
         : ['span', { class: 'error' }, input === ' ' ? '_' : input]
       : ['span', {}, target]
 
-const Text = ({ text, cursor }) => reduce(
-  (acc, ln) => append(newLineChar, concat(acc, map(Char(cursor), ln))),
-  [],
-  text
-)
+const Text = ({ text, cursor }) => [
+  'div',
+  {},
+  reduce(
+    (acc, ln) => append(newLineChar, concat(acc, map(Char(cursor), ln))),
+    [],
+    text
+  )
+]
 
-const Results = ({ completed, words, score }) => {
+const pathString = data => {
+  const xStep = 1000 / (length(data) - 1)
+  const dMin = Math.min(...data)
+  const dMax = Math.max(...data)
+  const dRange = dMax - dMin
+  return 'M ' + join(' L ', mapIndexed(
+    (d, i) => `${i * xStep},${CHART_Y * (d - dMin) / dRange}`,
+    data
+  ))
+}
+
+const Chart = ({ pathClass, data }) => [
+  'svg',
+  {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: `0 0 ${CHART_X} ${CHART_Y}`
+  },
+  [
+    ['path', {
+      class: pathClass,
+      transform: `translate(0, ${CHART_Y}) scale(1, -1)`,
+      d: pathString(data)
+    }, '']
+  ]
+]
+
+const Results = ({ completed, words, score, history }) => {
   if (!completed) {
     return []
   }
@@ -202,11 +235,25 @@ const Results = ({ completed, words, score }) => {
     `div`,
     {},
     [
-      ['span', {}, `typed ${Math.round(words)} words at `],
-      ['span', { class: 'wpm' }, `${Math.round(score.wpm)}wpm `],
-      ['span', {}, 'with '],
-      ['span', { class: 'accuracy' }, `${Math.round(score.accuracy)}% `],
-      ['span', {}, 'accuracy']
+      [
+        'div',
+        {},
+        [
+          ['span', {}, `typed ${Math.round(words)} words at `],
+          ['span', { class: 'wpm' }, `${Math.round(score.wpm)}wpm `],
+          ['span', {}, 'with '],
+          ['span', { class: 'accuracy' }, `${Math.round(score.accuracy)}% `],
+          ['span', {}, 'accuracy']
+        ]
+      ],
+      [
+        'div',
+        { class: 'charts' },
+        [
+          Chart({ pathClass: 'wpm', data: map(prop('wpm'), history) }),
+          Chart({ pathClass: 'accuracy', data: map(prop('accuracy'), history) })
+        ]
+      ]
     ]
   ]
 }
@@ -234,7 +281,7 @@ const view = (state, actions) => h('name', 'props', 'children')([
     [
       'div',
       {
-        class: 'text',
+        class: 'center-column',
         oncreate: () => window.addEventListener('keydown', actions.keydown)
       },
       [

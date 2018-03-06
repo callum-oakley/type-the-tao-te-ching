@@ -630,6 +630,45 @@ var curryN = /*#__PURE__*/_curry2(function curryN(length, fn) {
 });
 
 /**
+ * Creates a new list iteration function from an existing one by adding two new
+ * parameters to its callback function: the current index, and the entire list.
+ *
+ * This would turn, for instance, [`R.map`](#map) function into one that
+ * more closely resembles `Array.prototype.map`. Note that this will only work
+ * for functions in which the iteration callback function is the first
+ * parameter, and where the list is the last parameter. (This latter might be
+ * unimportant if the list parameter is not used.)
+ *
+ * @func
+ * @memberOf R
+ * @since v0.15.0
+ * @category Function
+ * @category List
+ * @sig ((a ... -> b) ... -> [a] -> *) -> (a ..., Int, [a] -> b) ... -> [a] -> *)
+ * @param {Function} fn A list iteration function that does not pass index or list to its callback
+ * @return {Function} An altered list iteration function that passes (item, index, list) to its callback
+ * @example
+ *
+ *      var mapIndexed = R.addIndex(R.map);
+ *      mapIndexed((val, idx) => idx + '-' + val, ['f', 'o', 'o', 'b', 'a', 'r']);
+ *      //=> ['0-f', '1-o', '2-o', '3-b', '4-a', '5-r']
+ */
+var addIndex = /*#__PURE__*/_curry1(function addIndex(fn) {
+  return curryN(fn.length, function () {
+    var idx = 0;
+    var origFn = arguments[0];
+    var list = arguments[arguments.length - 1];
+    var args = Array.prototype.slice.call(arguments, 0);
+    args[0] = function () {
+      var result = origFn.apply(this, _concat(arguments, [idx, list]));
+      idx += 1;
+      return result;
+    };
+    return fn.apply(this, args);
+  });
+});
+
+/**
  * Optimized internal three-arity curry function.
  *
  * @private
@@ -3894,6 +3933,39 @@ var objectWithoutProperties = function (obj, keys) {
   return target;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+var CHART_X = 1000;
+var CHART_Y = 200;
+
 // TODO
 //
 // - some kind of visual bell when input is disallowed (letter at end of line,
@@ -3904,10 +3976,8 @@ var objectWithoutProperties = function (obj, keys) {
 // - tab support
 //
 // - delete by word support
-//
-// - graph history
 
-var localData = window.localStorage.getItem('history');
+var mapIndexed = addIndex(map);
 
 var newLineChar = ['span', {}, '\n'];
 
@@ -3934,8 +4004,7 @@ var state = {
   text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
   strokes: 0,
-  errors: 0,
-  history: localData ? JSON.parse(localData) : []
+  errors: 0
 };
 
 var onChar = function onChar(key, _ref2) {
@@ -4033,7 +4102,8 @@ var checkComplete = function checkComplete(state) {
   var wpm = 60 * words / seconds;
   var accuracy = 100 * (state.strokes - state.errors) / state.strokes;
   var score = { wpm: wpm, accuracy: accuracy };
-  var history = append(score, state.history);
+  var localData = window.localStorage.getItem('history');
+  var history = append(score, localData ? JSON.parse(localData) : []);
   window.localStorage.setItem('history', JSON.stringify(history));
   return _extends({
     completed: true,
@@ -4076,25 +4146,49 @@ var Char = function Char(cursor) {
 var Text = function Text(_ref7) {
   var text = _ref7.text,
       cursor = _ref7.cursor;
-  return reduce(function (acc, ln) {
+  return ['div', {}, reduce(function (acc, ln) {
     return append(newLineChar, concat(acc, map(Char(cursor), ln)));
-  }, [], text);
+  }, [], text)];
 };
 
-var Results = function Results(_ref8) {
-  var completed = _ref8.completed,
-      words = _ref8.words,
-      score = _ref8.score;
+var pathString = function pathString(data) {
+  var xStep = 1000 / (length(data) - 1);
+  var dMin = Math.min.apply(Math, toConsumableArray(data));
+  var dMax = Math.max.apply(Math, toConsumableArray(data));
+  var dRange = dMax - dMin;
+  return 'M ' + join(' L ', mapIndexed(function (d, i) {
+    return i * xStep + ',' + CHART_Y * (d - dMin) / dRange;
+  }, data));
+};
+
+var Chart = function Chart(_ref8) {
+  var pathClass = _ref8.pathClass,
+      data = _ref8.data;
+  return ['svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: '0 0 ' + CHART_X + ' ' + CHART_Y
+  }, [['path', {
+    class: pathClass,
+    transform: 'translate(0, ' + CHART_Y + ') scale(1, -1)',
+    d: pathString(data)
+  }, '']]];
+};
+
+var Results = function Results(_ref9) {
+  var completed = _ref9.completed,
+      words = _ref9.words,
+      score = _ref9.score,
+      history = _ref9.history;
 
   if (!completed) {
     return [];
   }
-  return ['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(score.wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(score.accuracy) + '% '], ['span', {}, 'accuracy']]];
+  return ['div', {}, [['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(score.wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(score.accuracy) + '% '], ['span', {}, 'accuracy']]], ['div', { class: 'charts' }, [Chart({ pathClass: 'wpm', data: map(prop('wpm'), history) }), Chart({ pathClass: 'accuracy', data: map(prop('accuracy'), history) })]]]];
 };
 
 var view$2 = function view(state, actions) {
   return h$1('name', 'props', 'children')(['div', {}, [['div', {}, [['a', { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' }, '[project gutenberg]'], ['a', { class: 'right', href: 'https://github.com/hot-leaf-juice/gghf' }, '[source]']]], ['div', {
-    class: 'text',
+    class: 'center-column',
     oncreate: function oncreate() {
       return window.addEventListener('keydown', actions.keydown);
     }
