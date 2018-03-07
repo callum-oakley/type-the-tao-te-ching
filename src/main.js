@@ -18,7 +18,7 @@ import {
   takeWhile
 } from 'ramda'
 
-import texts from './tao-te-ching.json'
+import texts from './texts.json'
 
 const CHART_X = 1000
 const CHART_Y = 200

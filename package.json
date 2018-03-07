@@ -24,7 +24,7 @@
     "lint": "standard --verbose | snazzy",
     "build": "rollup -c && cp src/style.css src/index.html build",
     "lint:build": "clear && yarn lint && clear && yarn build",
-    "process-text": "babel-node scripts/process-text.js texts/tao-te-ching.txt",
+    "process-text": "babel-node scripts/process-text.js",
     "deploy": "git subtree push --prefix build origin gh-pages"
   },
   "babel": {

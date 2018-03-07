@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { basename } from 'path'
 import {
   compose,
   dropWhile,
@@ -32,4 +31,4 @@ const writeJSON = (path, data) => {
 }
 
 const path = process.argv[2]
-writeJSON(`src/${basename(path, '.txt')}.json`, paragraphs(readText(path)))
+writeJSON(`src/texts.json`, paragraphs(readText(path)))
