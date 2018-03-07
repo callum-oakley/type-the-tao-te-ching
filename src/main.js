@@ -70,12 +70,13 @@ const text = compose(
 
 const choose = x => x[Math.round(Math.random() * length(x))]
 
-const state = {
+const initialState = () => ({
   text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
   strokes: 0,
-  errors: 0
-}
+  errors: 0,
+  completed: false
+})
 
 const onChar = (
   key,
@@ -156,20 +157,21 @@ const checkComplete = state => {
   const history = append(score, localData ? JSON.parse(localData) : [])
   window.localStorage.setItem('history', JSON.stringify(history))
   return {
+    ...state,
     completed: true,
     words,
     score,
-    history,
-    ...state
+    history
   }
 }
 
 const actions = {
   keydown: event => state => {
-    if (state.completed) {
-      return
-    }
-    if (length(event.key) === 1 && !isModified(event)) {
+    if (state.completed && event.key === 'Enter') {
+      event.preventDefault()
+      return initialState()
+    } else if (state.completed) {
+    } else if (length(event.key) === 1 && !isModified(event)) {
       event.preventDefault()
       return checkComplete(onChar(event.key, state))
     } else if (event.key === 'Enter') {
@@ -202,7 +204,7 @@ const Text = ({ text, cursor }) => [
 ]
 
 const pathString = data => {
-  const xStep = 1000 / (length(data) - 1)
+  const xStep = CHART_X / (length(data) - 1)
   const dMin = Math.min(...data)
   const dMax = Math.max(...data)
   const dRange = dMax - dMin
@@ -219,11 +221,15 @@ const Chart = ({ pathClass, data }) => [
     viewBox: `0 0 ${CHART_X} ${CHART_Y}`
   },
   [
-    ['path', {
-      class: pathClass,
-      transform: `translate(0, ${CHART_Y}) scale(1, -1)`,
-      d: pathString(data)
-    }, '']
+    [
+      'path',
+      {
+        class: pathClass,
+        transform: `translate(0, ${CHART_Y}) scale(1, -1)`,
+        d: pathString(data)
+      },
+      ''
+    ]
   ]
 ]
 
@@ -243,7 +249,7 @@ const Results = ({ completed, words, score, history }) => {
           ['span', { class: 'wpm' }, `${Math.round(score.wpm)}wpm `],
           ['span', {}, 'with '],
           ['span', { class: 'accuracy' }, `${Math.round(score.accuracy)}% `],
-          ['span', {}, 'accuracy']
+          ['span', {}, 'accuracy \u2013 hit enter to restart']
         ]
       ],
       [
@@ -292,4 +298,4 @@ const view = (state, actions) => h('name', 'props', 'children')([
   ]
 ])
 
-window.main = app(state, actions, view, document.body)
+window.main = app(initialState(), actions, view, document.body)
