@@ -1,6 +1,7 @@
 {
   "name": "gghf",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "license": "ISC",
   "dependencies": {
     "hyperapp": "^1.0.2",
     "ijk": "^0.16.0",

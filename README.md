@@ -29,3 +29,9 @@ manual attention, but it&rsquo;s a good place to start.
 
 [0]: http://www.gutenberg.org/ebooks/216
 [1]: https://hyperapp.js.org/
+
+## Deploy
+
+Deploy to the `build` folder to github pages with
+
+    yarn deploy
