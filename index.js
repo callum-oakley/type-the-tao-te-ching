@@ -4000,11 +4000,14 @@ var choose = function choose(x) {
   return x[Math.round(Math.random() * length(x))];
 };
 
-var state = {
-  text: text(choose(texts)),
-  cursor: { line: 0, char: 0 },
-  strokes: 0,
-  errors: 0
+var initialState = function initialState() {
+  return {
+    text: text(choose(texts)),
+    cursor: { line: 0, char: 0 },
+    strokes: 0,
+    errors: 0,
+    completed: false
+  };
 };
 
 var onChar = function onChar(key, _ref2) {
@@ -4105,21 +4108,21 @@ var checkComplete = function checkComplete(state) {
   var localData = window.localStorage.getItem('history');
   var history = append(score, localData ? JSON.parse(localData) : []);
   window.localStorage.setItem('history', JSON.stringify(history));
-  return _extends({
+  return _extends({}, state, {
     completed: true,
     words: words,
     score: score,
     history: history
-  }, state);
+  });
 };
 
 var actions = {
   keydown: function keydown(event) {
     return function (state) {
-      if (state.completed) {
-        return;
-      }
-      if (length(event.key) === 1 && !isModified(event)) {
+      if (state.completed && event.key === 'Enter') {
+        event.preventDefault();
+        return initialState();
+      } else if (state.completed) {} else if (length(event.key) === 1 && !isModified(event)) {
         event.preventDefault();
         return checkComplete(onChar(event.key, state));
       } else if (event.key === 'Enter') {
@@ -4152,7 +4155,7 @@ var Text = function Text(_ref7) {
 };
 
 var pathString = function pathString(data) {
-  var xStep = 1000 / (length(data) - 1);
+  var xStep = CHART_X / (length(data) - 1);
   var dMin = Math.min.apply(Math, toConsumableArray(data));
   var dMax = Math.max.apply(Math, toConsumableArray(data));
   var dRange = dMax - dMin;
@@ -4183,7 +4186,7 @@ var Results = function Results(_ref9) {
   if (!completed) {
     return [];
   }
-  return ['div', {}, [['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(score.wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(score.accuracy) + '% '], ['span', {}, 'accuracy']]], ['div', { class: 'charts' }, [Chart({ pathClass: 'wpm', data: map(prop('wpm'), history) }), Chart({ pathClass: 'accuracy', data: map(prop('accuracy'), history) })]]]];
+  return ['div', {}, [['div', {}, [['span', {}, 'typed ' + Math.round(words) + ' words at '], ['span', { class: 'wpm' }, Math.round(score.wpm) + 'wpm '], ['span', {}, 'with '], ['span', { class: 'accuracy' }, Math.round(score.accuracy) + '% '], ['span', {}, 'accuracy \u2013 hit enter to restart']]], ['div', { class: 'charts' }, [Chart({ pathClass: 'wpm', data: map(prop('wpm'), history) }), Chart({ pathClass: 'accuracy', data: map(prop('accuracy'), history) })]]]];
 };
 
 var view$2 = function view(state, actions) {
@@ -4195,6 +4198,6 @@ var view$2 = function view(state, actions) {
   }, [Text(state), Results(state, actions)]]]]);
 };
 
-window.main = app(state, actions, view$2, document.body);
+window.main = app(initialState(), actions, view$2, document.body);
 
 }());
