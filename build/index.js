@@ -4004,6 +4004,7 @@ var initialState = function initialState() {
   return {
     text: text(choose(texts)),
     cursor: { line: 0, char: 0 },
+    started: undefined,
     strokes: 0,
     errors: 0,
     completed: false

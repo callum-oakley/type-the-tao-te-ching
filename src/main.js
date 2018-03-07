@@ -73,6 +73,7 @@ const choose = x => x[Math.round(Math.random() * length(x))]
 const initialState = () => ({
   text: text(choose(texts)),
   cursor: { line: 0, char: 0 },
+  started: undefined,
   strokes: 0,
   errors: 0,
   completed: false
