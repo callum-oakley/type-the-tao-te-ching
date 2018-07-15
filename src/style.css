@@ -1,7 +1,8 @@
 body {
-  background-color: #1B2B34;
-  color: #65737E;
-  font-family: 'Source Code Pro', monospace;
+  background-color: #f3f3f3;
+  color: #949494;
+  font-family: Nitti, monospace;
+  font-weight: 300;
 }
 
 a {
@@ -10,7 +11,7 @@ a {
 }
 
 a:hover {
-  color: #5FB3B3;
+  color: #4271ae;
 }
 
 .center-column {
@@ -24,26 +25,26 @@ a:hover {
 }
 
 .correct {
-  color: #C0C5CE;
+  color: #4d4d4c;
 }
 
 .error {
-  color: #EC5f67;
+  color: #df0000;
 }
 
 .cursor {
-  background-color: #C0C5CE;
-  color: #1B2B34;
+  background-color: #4d4d4c;
+  color: #f3f3f3;
 }
 
 .wpm {
-  color: #99C794;
-  stroke: #99C794;
+  color: #8959a8;
+  stroke: #8959a8;
 }
 
 .accuracy {
-  color: #5FB3B3;
-  stroke: #5FB3B3;
+  color: #d75f00;
+  stroke: #d75f00;
 }
 
 .left {
