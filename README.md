@@ -1,4 +1,4 @@
-# gghf (pending a better name)
+# Type The Tao Te Ching
 
 A typing practice app aiming for a simple interface. Featuring passages from
 the Tao Te Ching ([courtesy of Project Gutenberg][0]) and powered by
@@ -9,7 +9,7 @@ the Tao Te Ching ([courtesy of Project Gutenberg][0]) and powered by
 ## Use
 
 Type through the greyed out passage. Errors are highlighted in red and *must be
-corrected*. A wmp and accuracy score will be displayed upon completion along
+corrected*. A WMP and accuracy score will be displayed upon completion along
 with basic graphs of historical scores.
 
 ## Build locally
