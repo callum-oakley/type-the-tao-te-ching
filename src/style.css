@@ -30,6 +30,7 @@ a:hover {
 
 .error {
   color: #df0000;
+  font-weight: 500;
 }
 
 .cursor {
