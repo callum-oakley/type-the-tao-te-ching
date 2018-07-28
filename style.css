@@ -60,6 +60,15 @@ a:hover {
   right: 1rem;
 }
 
+.brightness {
+  top: 2.5rem;
+}
+
+.dark {
+  background-color: #1d1b1b;
+  color: #f3f3f3;
+}
+
 svg {
   display: block;
   fill: none;
