@@ -83,8 +83,8 @@ const checkComplete = state => {
   }
   const seconds = (Date.now() - state.started) / 1000
   const words = length(state.text) / 5
-  const wpm = 60 * words / seconds
-  const accuracy = 100 * (state.strokes - state.errors) / state.strokes
+  const wpm = (60 * words) / seconds
+  const accuracy = (100 * (state.strokes - state.errors)) / state.strokes
   const score = { wpm, accuracy }
   const localData = window.localStorage.getItem('history')
   const history = append(score, localData ? JSON.parse(localData) : [])
@@ -105,6 +105,16 @@ const actions = {
       event.preventDefault()
       return onBackspace(state)
     }
+  },
+  toggleBrightness: () => {
+    const body = document.getElementsByTagName('body')[0]
+    if (body.classList.contains('dark')) {
+      body.classList.remove('dark')
+    } else {
+      (
+      body.classList.add('dark')
+    )
+    }
   }
 }
 
@@ -117,21 +127,23 @@ const Char = cursor => ({ target, input, char }) =>
         : ['span', { class: 'error' }, input === ' ' ? '_' : input]
       : ['span', {}, target]
 
-const Text = ({ text, cursor }) => [
-  'div',
-  {},
-  map(Char(cursor), text)
-]
+const Text = ({ text, cursor }) => ['div', {}, map(Char(cursor), text)]
 
 const pathString = data => {
   const xStep = CHART_X / (length(data) - 1)
   const dMin = Math.min(...data)
   const dMax = Math.max(...data)
   const dRange = dMax - dMin
-  return 'M ' + join(' L ', mapIndexed(
-    (d, i) => `${i * xStep},${CHART_Y * (d - dMin) / dRange}`,
-    data
-  ))
+  return (
+    'M ' +
+    join(
+      ' L ',
+      mapIndexed(
+        (d, i) => `${i * xStep},${(CHART_Y * (d - dMin)) / dRange}`,
+        data
+      )
+    )
+  )
 }
 
 const Chart = ({ pathClass, data }) => [
@@ -184,38 +196,48 @@ const Results = ({ completed, words, score, history }) => {
   ]
 }
 
-const view = (state, actions) => h('name', 'props', 'children')([
-  'div',
-  {},
-  [
+const view = (state, actions) =>
+  h('name', 'props', 'children')([
+    'div',
+    {},
     [
-      'div',
-      {},
       [
+        'div',
+        {},
         [
-          'a',
-          { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' },
-          '[project gutenberg]'
-        ],
-        [
-          'a',
-          { class: 'right', href: 'https://github.com/callum-oakley/type-the-tao-te-ching' },
-          '[source]'
+          [
+            'a',
+            { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' },
+            '[project gutenberg]'
+          ],
+          [
+            'a',
+            {
+              class: 'right',
+              href: 'https://github.com/callum-oakley/type-the-tao-te-ching'
+            },
+            '[source]'
+          ],
+          [
+            'a',
+            {
+              class: 'right brightness',
+              href: '#',
+              onclick: () => actions.toggleBrightness()
+            },
+            '[brightness]'
+          ]
         ]
-      ]
-    ],
-    [
-      'div',
-      {
-        class: 'center-column',
-        oncreate: () => window.addEventListener('keydown', actions.keydown)
-      },
+      ],
       [
-        Text(state),
-        Results(state, actions)
+        'div',
+        {
+          class: 'center-column',
+          oncreate: () => window.addEventListener('keydown', actions.keydown)
+        },
+        [Text(state), Results(state, actions)]
       ]
     ]
-  ]
-])
+  ])
 
 window.main = app(initialState(), actions, view, document.body)
