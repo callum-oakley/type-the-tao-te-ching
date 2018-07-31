@@ -107,25 +107,38 @@ const actions = {
     }
   },
   toggleBrightness: () => {
-    const body = document.getElementsByTagName('body')[0]
-    if (body.classList.contains('dark')) {
-      body.classList.remove('dark')
-    } else {
-      (
-      body.classList.add('dark')
-    )
-    }
+    toggleBodyDarkness()
+    toggleSpanBrightness()
   }
+}
+
+const toggleBodyDarkness = () => {
+  const body = document.getElementsByTagName('body')[0]
+  body.classList.contains('dark') ? body.classList.remove('dark') : body.classList.add('dark')
+}
+
+const toggleSpanBrightness = () => {
+  const span = document.getElementsByTagName('span')
+  for (let i = 0; i < span.length; i++) {
+    span[i].classList.contains('dark') ? span[i].classList.remove('dark') : span[i].classList.add('dark')
+  }
+}
+
+const dark = (baseClass) => {
+  if (document.getElementsByTagName('body')[0].classList.contains('dark')) {
+    return `${baseClass} dark`.trim()
+  }
+  return `${baseClass}`
 }
 
 const Char = cursor => ({ target, input, char }) =>
   cursor === char
-    ? ['span', { class: 'cursor' }, target]
+    ? ['span', { class: dark('cursor') }, target]
     : input
       ? input === target
-        ? ['span', { class: 'correct' }, input]
-        : ['span', { class: 'error' }, input === ' ' ? '_' : input]
-      : ['span', {}, target]
+        ? ['span', { class: dark('correct') }, input]
+        : ['span', { class: dark('error') }, input === ' ' ? '_' : input]
+      : ['span', { class: dark('') }, target]
 
 const Text = ({ text, cursor }) => ['div', {}, map(Char(cursor), text)]
 

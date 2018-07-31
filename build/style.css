@@ -5,6 +5,11 @@ body {
   font-weight: 300;
 }
 
+.dark {
+  background-color: #262626;
+  color: #808080;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -28,6 +33,10 @@ a:hover {
   color: #4d4d4c;
 }
 
+.correct.dark {
+  color: #d0d0d0;
+}
+
 .error {
   color: #df0000;
   font-weight: 500;
@@ -36,6 +45,11 @@ a:hover {
 .cursor {
   background-color: #4d4d4c;
   color: #f3f3f3;
+}
+
+.cusor.dark {
+  background-color: #d0d0d0;
+  color: #262626;
 }
 
 .wpm {
@@ -62,11 +76,6 @@ a:hover {
 
 .brightness {
   top: 2.5rem;
-}
-
-.dark {
-  background-color: #1d1b1b;
-  color: #f3f3f3;
 }
 
 svg {
