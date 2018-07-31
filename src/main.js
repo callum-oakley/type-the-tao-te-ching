@@ -190,11 +190,11 @@ const Results = ({ completed, words, score, history }) => {
         'div',
         {},
         [
-          ['span', {}, `\ntyped ${Math.round(words)} words at `],
-          ['span', { class: 'wpm' }, `${Math.round(score.wpm)}wpm `],
-          ['span', {}, 'with '],
-          ['span', { class: 'accuracy' }, `${Math.round(score.accuracy)}% `],
-          ['span', {}, 'accuracy \u2013 hit enter to restart']
+          ['span', { class: dark('') }, `\ntyped ${Math.round(words)} words at `],
+          ['span', { class: dark('wpm') }, `${Math.round(score.wpm)}wpm `],
+          ['span', { class: dark('') }, 'with '],
+          ['span', { class: dark('accuracy') }, `${Math.round(score.accuracy)}% `],
+          ['span', { class: dark('') }, 'accuracy \u2013 hit enter to restart']
         ]
       ],
       [
