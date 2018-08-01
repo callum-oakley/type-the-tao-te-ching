@@ -114,13 +114,17 @@ const actions = {
 
 const toggleBodyDarkness = () => {
   const body = document.getElementsByTagName('body')[0]
-  body.classList.contains('dark') ? body.classList.remove('dark') : body.classList.add('dark')
+  body.classList.contains('dark')
+    ? body.classList.remove('dark')
+    : body.classList.add('dark')
 }
 
 const toggleSpanBrightness = () => {
   const span = document.getElementsByTagName('span')
   for (let i = 0; i < span.length; i++) {
-    span[i].classList.contains('dark') ? span[i].classList.remove('dark') : span[i].classList.add('dark')
+    span[i].classList.contains('dark')
+      ? span[i].classList.remove('dark')
+      : span[i].classList.add('dark')
   }
 }
 
