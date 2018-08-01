@@ -9,7 +9,7 @@ the Tao Te Ching ([courtesy of Project Gutenberg][0]) and powered by
 ## Use
 
 Type through the greyed out passage. Errors are highlighted in red and *must be
-corrected*. A WMP and accuracy score will be displayed upon completion along
+corrected*. A WPM and accuracy score will be displayed upon completion along
 with basic graphs of historical scores.
 
 ## Build locally

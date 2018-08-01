@@ -83,8 +83,8 @@ const checkComplete = state => {
   }
   const seconds = (Date.now() - state.started) / 1000
   const words = length(state.text) / 5
-  const wpm = 60 * words / seconds
-  const accuracy = 100 * (state.strokes - state.errors) / state.strokes
+  const wpm = (60 * words) / seconds
+  const accuracy = (100 * (state.strokes - state.errors)) / state.strokes
   const score = { wpm, accuracy }
   const localData = window.localStorage.getItem('history')
   const history = append(score, localData ? JSON.parse(localData) : [])
@@ -105,33 +105,58 @@ const actions = {
       event.preventDefault()
       return onBackspace(state)
     }
+  },
+  toggleBrightness: () => {
+    toggleBodyDarkness()
+    toggleSpanBrightness()
   }
+}
+
+const toggleBodyDarkness = () => {
+  const body = document.getElementsByTagName('body')[0]
+  body.classList.contains('dark') ? body.classList.remove('dark') : body.classList.add('dark')
+}
+
+const toggleSpanBrightness = () => {
+  const span = document.getElementsByTagName('span')
+  for (let i = 0; i < span.length; i++) {
+    span[i].classList.contains('dark') ? span[i].classList.remove('dark') : span[i].classList.add('dark')
+  }
+}
+
+const dark = (baseClass) => {
+  if (document.getElementsByTagName('body')[0].classList.contains('dark')) {
+    return `${baseClass} dark`.trim()
+  }
+  return `${baseClass}`
 }
 
 const Char = cursor => ({ target, input, char }) =>
   cursor === char
-    ? ['span', { class: 'cursor' }, target]
+    ? ['span', { class: dark('cursor') }, target]
     : input
       ? input === target
-        ? ['span', { class: 'correct' }, input]
-        : ['span', { class: 'error' }, input === ' ' ? '_' : input]
-      : ['span', {}, target]
+        ? ['span', { class: dark('correct') }, input]
+        : ['span', { class: dark('error') }, input === ' ' ? '_' : input]
+      : ['span', { class: dark('') }, target]
 
-const Text = ({ text, cursor }) => [
-  'div',
-  {},
-  map(Char(cursor), text)
-]
+const Text = ({ text, cursor }) => ['div', {}, map(Char(cursor), text)]
 
 const pathString = data => {
   const xStep = CHART_X / (length(data) - 1)
   const dMin = Math.min(...data)
   const dMax = Math.max(...data)
   const dRange = dMax - dMin
-  return 'M ' + join(' L ', mapIndexed(
-    (d, i) => `${i * xStep},${CHART_Y * (d - dMin) / dRange}`,
-    data
-  ))
+  return (
+    'M ' +
+    join(
+      ' L ',
+      mapIndexed(
+        (d, i) => `${i * xStep},${(CHART_Y * (d - dMin)) / dRange}`,
+        data
+      )
+    )
+  )
 }
 
 const Chart = ({ pathClass, data }) => [
@@ -165,11 +190,11 @@ const Results = ({ completed, words, score, history }) => {
         'div',
         {},
         [
-          ['span', {}, `\ntyped ${Math.round(words)} words at `],
-          ['span', { class: 'wpm' }, `${Math.round(score.wpm)}wpm `],
-          ['span', {}, 'with '],
-          ['span', { class: 'accuracy' }, `${Math.round(score.accuracy)}% `],
-          ['span', {}, 'accuracy \u2013 hit enter to restart']
+          ['span', { class: dark('') }, `\ntyped ${Math.round(words)} words at `],
+          ['span', { class: dark('wpm') }, `${Math.round(score.wpm)}wpm `],
+          ['span', { class: dark('') }, 'with '],
+          ['span', { class: dark('accuracy') }, `${Math.round(score.accuracy)}% `],
+          ['span', { class: dark('') }, 'accuracy \u2013 hit enter to restart']
         ]
       ],
       [
@@ -184,38 +209,48 @@ const Results = ({ completed, words, score, history }) => {
   ]
 }
 
-const view = (state, actions) => h('name', 'props', 'children')([
-  'div',
-  {},
-  [
+const view = (state, actions) =>
+  h('name', 'props', 'children')([
+    'div',
+    {},
     [
-      'div',
-      {},
       [
+        'div',
+        {},
         [
-          'a',
-          { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' },
-          '[project gutenberg]'
-        ],
-        [
-          'a',
-          { class: 'right', href: 'https://github.com/callum-oakley/type-the-tao-te-ching' },
-          '[source]'
+          [
+            'a',
+            { class: 'left', href: 'http://www.gutenberg.org/ebooks/216' },
+            '[project gutenberg]'
+          ],
+          [
+            'a',
+            {
+              class: 'right',
+              href: 'https://github.com/callum-oakley/type-the-tao-te-ching'
+            },
+            '[source]'
+          ],
+          [
+            'a',
+            {
+              class: 'right brightness',
+              href: '#',
+              onclick: () => actions.toggleBrightness()
+            },
+            '[brightness]'
+          ]
         ]
-      ]
-    ],
-    [
-      'div',
-      {
-        class: 'center-column',
-        oncreate: () => window.addEventListener('keydown', actions.keydown)
-      },
+      ],
       [
-        Text(state),
-        Results(state, actions)
+        'div',
+        {
+          class: 'center-column',
+          oncreate: () => window.addEventListener('keydown', actions.keydown)
+        },
+        [Text(state), Results(state, actions)]
       ]
     ]
-  ]
-])
+  ])
 
 window.main = app(initialState(), actions, view, document.body)
