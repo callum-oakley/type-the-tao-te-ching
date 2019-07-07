@@ -9,6 +9,7 @@ body {
   background-color: #f3f3f3;
   color: #949494;
   font-family: "IBM Plex Mono", monospace;
+  line-height: 1.4;
 }
 
 .dark {
